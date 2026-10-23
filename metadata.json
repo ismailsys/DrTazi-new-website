@@ -1,0 +1,6 @@
+{
+  "name": "Dr. El Hassan Tazi - Chirurgie Plastique & Esthétique Casablanca",
+  "description": "Nouvelle version raffinée de Drtazi.com : Chirurgie plastique, esthétique, reconstructrice et médecine esthétique d'excellence à Casablanca par le Dr. El Hassan Tazi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
