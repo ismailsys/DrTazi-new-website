@@ -20,47 +20,48 @@ import { ContactPage } from './pages/ContactPage';
 import { PageRoute } from './types/data';
 
 export default function App() {
-  const [currentPath, setCurrentPath] = useState<PageRoute>(() => {
+  const getRouteFromUrl = (): PageRoute => {
     const p = window.location.pathname;
-    if (
-      p === '/specialites' ||
-      p === '/avant-apres' ||
-      p === '/questions-reponses' ||
-      p === '/videotheque' ||
-      p === '/actualites' ||
-      p === '/contact'
-    ) {
-      return p as PageRoute;
-    }
+    const h = window.location.hash;
+    const combined = `${p} ${h}`.toLowerCase();
+    if (combined.includes('specialites')) return '/specialites';
+    if (combined.includes('avant-apres')) return '/avant-apres';
+    if (combined.includes('questions-reponses') || combined.includes('qr')) return '/questions-reponses';
+    if (combined.includes('videotheque')) return '/videotheque';
+    if (combined.includes('actualites')) return '/actualites';
+    if (combined.includes('contact')) return '/contact';
     return '/';
-  });
+  };
+
+  const [currentPath, setCurrentPath] = useState<PageRoute>(getRouteFromUrl);
 
   const [toastNotification, setToastNotification] = useState<string | null>(null);
 
-  // Sync with browser back/forward buttons
+  // Sync with browser back/forward buttons and hashchange
   useEffect(() => {
-    const handlePopState = () => {
-      const p = window.location.pathname;
-      if (
-        p === '/specialites' ||
-        p === '/avant-apres' ||
-        p === '/questions-reponses' ||
-        p === '/videotheque' ||
-        p === '/actualites' ||
-        p === '/contact'
-      ) {
-        setCurrentPath(p as PageRoute);
-      } else {
-        setCurrentPath('/');
-      }
+    const handleUrlChange = () => {
+      setCurrentPath(getRouteFromUrl());
     };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+    };
   }, []);
 
   const handleNavigate = (path: PageRoute) => {
     setCurrentPath(path);
-    window.history.pushState({}, '', path);
+    try {
+      const isSubpath = window.location.pathname.includes('/DrTazi-new-website');
+      if (isSubpath) {
+        window.location.hash = path === '/' ? '' : path.replace(/^\//, '');
+      } else {
+        window.history.pushState({}, '', path);
+      }
+    } catch {
+      // fallback
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
